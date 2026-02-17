@@ -390,8 +390,10 @@ async function loadRecentActivity() {
 // ─── EVENT LISTENERS ──────────────────────────────────────────────────────────
 
 function setupEventListeners() {
-  document.querySelectorAll('[id^="addPatient"]').forEach(btn => {
-    btn?.addEventListener('click', () => openAddPatientModal());
+  // ✅ Only target the actual Add Patient BUTTONS, not inputs inside the modal
+  const addPatientButtons = ['addPatientBtn', 'addPatientBtn2', 'addPatientBtn3'];
+  addPatientButtons.forEach(id => {
+    document.getElementById(id)?.addEventListener('click', () => openAddPatientModal());
   });
 
   document.querySelectorAll('[id^="addMedicine"]').forEach(btn => {
@@ -419,4 +421,4 @@ function setupEventListeners() {
     document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
     document.getElementById('reportsPage').style.display = 'block';
   });
-}
+  }
