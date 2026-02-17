@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TabTimer - Never miss your medicine with smart reminders, voice instructions, and real-time tracking">
+  <meta name="theme-color" content="#4b45f5">
+  <title>TabTimer - Smart Medicine Reminder</title>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layouts.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="assets/icons/icon-192x192.png">
+  
+  <style>
+    /* Landing Page Specific Styles */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 50%, var(--success-50) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -15%;
+      width: 60%;
+      height: 130%;
+      background: radial-gradient(circle, rgba(93, 104, 255, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    
+    .hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-8) var(--space-6);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-12);
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .hero-content h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: var(--space-6);
+      background: linear-gradient(135deg, var(--primary-700), var(--primary-900));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .hero-content p {
+      font-size: var(--font-size-xl);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-8);
+      line-height: 1.6;
+    }
+    
+    .hero-cta {
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+    
+    .hero-image {
+      position: relative;
+    }
+    
+    .hero-image-mockup {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      background: white;
+      border-radius: var(--radius-2xl);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+      padding: var(--space-6);
+      transform: rotate(-3deg);
+      transition: transform var(--transition-slow);
+    }
+    
+    .hero-image-mockup:hover {
+      transform: rotate(0deg);
+    }
+    
+    .features {
+      padding: var(--space-20) var(--space-6);
+      background: var(--bg-primary);
+    }
+    
+    .features-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .features-header {
+      text-align: center;
+      margin-bottom: var(--space-12);
+    }
+    
+    .features-header h2 {
+      font-family: var(--font-display);
+      font-size: var(--font-size-3xl);
+      font-weight: 700;
+      margin-bottom: var(--space-4);
+      color: var(--text-primary);
+    }
+    
+    .features-header p {
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-8);
+    }
+    
+    .feature-card {
+      text-align: center;
+      padding: var(--space-8);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+      transition: all var(--transition-base);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .feature-icon {
+      width: 4rem;
+      height: 4rem;
+      margin: 0 auto var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+      border-radius: var(--radius-xl);
+    }
+    
+    .feature-card h3 {
+      font-size: var(--font-size-xl);
+      font-weight: 600;
+      margin-bottom: var(--space-3);
+      color: var(--text-primary);
+    }
+    
+    .feature-card p {
+      font-size: var(--font-size-md);
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    
+    @media (max-width: 768px) {
+      .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      
+      .hero-cta {
+        justify-content: center;
+      }
+      
+      .hero-image {
+        order: -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-content">
+        <h1>Never Miss Your Medicine Again</h1>
+        <p>Smart reminders, voice instructions, and real-time tracking to help you stay on top of your health.</p>
+        <div class="hero-cta">
+          <a href="auth-signup.html" class="btn btn-primary btn-lg">Get Started Free</a>
+          <a href="auth-login.html" class="btn btn-outline btn-lg">Sign In</a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="hero-image-mockup">
+          <div style="text-align: center; padding: 2rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">💊</div>
+            <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">08:00 AM</h3>
+            <p style="color: var(--text-secondary);">Time for your Aspirin</p>
+            <div style="margin-top: 2rem; height: 8px; background: var(--gray-200); border-radius: 999px; overflow: hidden;">
+              <div style="width: 75%; height: 100%; background: linear-gradient(90deg, var(--success), var(--success-600)); border-radius: 999px;"></div>
+            </div>
+            <p style="font-size: 0.875rem; color: var(--text-tertiary); margin-top: 1rem;">3 of 4 taken today</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="features-container">
+      <div class="features-header">
+        <h2>Everything You Need to Stay Healthy</h2>
+        <p>Powerful features designed to make medicine management simple and stress-free</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⏰</div>
+          <h3>Smart Reminders</h3>
+          <p>Get timely notifications when it's time to take your medicine. Never forget a dose again.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎤</div>
+          <h3>Voice Instructions</h3>
+          <p>Record personalized voice messages with instructions for each medicine.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">👨‍⚕️</div>
+          <h3>Caregiver Access</h3>
+          <p>Caregivers can manage medicines and monitor adherence for their patients.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Track Progress</h3>
+          <p>View detailed reports and analytics on medicine adherence and health trends.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>Stock Tracking</h3>
+          <p>Monitor medicine inventory and get alerts when stocks are running low.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔔</div>
+          <h3>Real-time Sync</h3>
+          <p>All your devices stay synchronized in real-time across all platforms.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="background: var(--gray-900); color: white; padding: var(--space-12) var(--space-6); text-align: center;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="font-family: var(--font-display); font-size: var(--font-size-2xl); font-weight: 700; margin-bottom: var(--space-4);">
+        💊 TabTimer
+      </div>
+      <p style="color: var(--gray-400); margin-bottom: var(--space-6);">
+        Your trusted companion for medicine management
+      </p>
+      <div style="display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; font-size: var(--font-size-sm); color: var(--gray-400);">
+        <a href="#" style="color: var(--gray-400); text-decoration: none;">Privacy Policy</a>
+        <a href="#" style="color: var(--gray-400); text-decoration: none;">Terms of Service</a>
+        <a href="#" style="color: var(--gray-400); text-decoration: none;">Contact Us</a>
+      </div>
+      <p style="color: var(--gray-500); font-size: var(--font-size-sm); margin-top: var(--space-6);">
+        © 2026 TabTimer. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/js/service-worker.js')
+          .then(reg => console.log('Service Worker registered'))
+          .catch(err => console.log('Service Worker registration failed', err));
+      });
+    }
+  </script>
+</body>
+</html>

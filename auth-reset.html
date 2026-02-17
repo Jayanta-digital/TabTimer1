@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4b45f5">
+  <title>Reset Password - TabTimer</title>
+  
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layouts.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div class="auth-logo-icon">💊</div>
+          <div class="auth-logo-text">TabTimer</div>
+        </div>
+        
+        <div class="auth-header">
+          <h1 class="auth-title">Reset Password</h1>
+          <p class="auth-subtitle">Enter your email to receive a password reset link</p>
+        </div>
+        
+        <form class="auth-form" id="resetForm">
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input 
+              type="email" 
+              id="email" 
+              class="form-control" 
+              placeholder="your.email@example.com"
+              required
+              autocomplete="email"
+            >
+            <span class="form-error">Please enter a valid email address</span>
+          </div>
+          
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary auth-submit">
+            Send Reset Link
+          </button>
+        </form>
+        
+        <div class="auth-footer">
+          Remember your password? <a href="auth-login.html">Sign In</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal" id="successModal">
+    <div class="modal-content">
+      <div class="modal-body" style="text-align: center; padding: 3rem;">
+        <div style="font-size: 4rem; margin-bottom: 1.5rem;">✅</div>
+        <h2 style="margin-bottom: 1rem;">Check Your Email</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+          We've sent a password reset link to your email address. 
+          Please check your inbox and follow the instructions.
+        </p>
+        <a href="auth-login.html" class="btn btn-primary">Back to Login</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script>
+    // Email validation
+    document.getElementById('email').addEventListener('blur', function() {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (this.value && !emailRegex.test(this.value)) {
+        this.classList.add('error');
+      } else {
+        this.classList.remove('error');
+      }
+    });
+
+    // Remove error styling on input
+    document.getElementById('email').addEventListener('input', function() {
+      this.classList.remove('error');
+    });
+
+    // Form submission
+    document.getElementById('resetForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+
+      // Validate email
+      if (!FormValidator.validateEmail(email)) {
+        document.getElementById('email').classList.add('error');
+        return;
+      }
+
+      // Show loading state
+      const submitBtn = this.querySelector('button[type="submit"]');
+      UIUtils.showLoading(submitBtn, 'Sending...');
+
+      try {
+        // TODO: Implement actual password reset with Supabase
+        console.log('Reset password for:', email);
+        
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Show success modal
+        UIUtils.hideLoading(submitBtn);
+        UIUtils.showModal('successModal');
+      } catch (error) {
+        console.error('Password reset failed:', error);
+        UIUtils.hideLoading(submitBtn);
+        toast.error('Failed to send reset link. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>

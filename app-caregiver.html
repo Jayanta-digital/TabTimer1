@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4b45f5">
+  <title>Caregiver Dashboard - TabTimer</title>
+  
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layouts.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="navbar-container">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+        
+        <a href="app-caregiver.html" class="navbar-logo">
+          <div class="navbar-logo-icon">💊</div>
+          <span>TabTimer</span>
+        </a>
+        
+        <div class="navbar-search">
+          <span class="navbar-search-icon">🔍</span>
+          <input type="text" placeholder="Search patients or medicines..." id="globalSearch">
+        </div>
+        
+        <div class="navbar-actions">
+          <button class="navbar-notification" id="notificationBtn">
+            🔔
+            <span class="navbar-notification-badge" id="notificationBadge">3</span>
+          </button>
+          
+          <div class="navbar-profile" id="profileBtn">
+            <div class="navbar-profile-avatar" id="userAvatar">CG</div>
+            <span class="navbar-profile-name" id="userName">Caregiver</span>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="dashboard-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+          <a href="#" class="sidebar-nav-item active" data-page="dashboard">
+            <span class="sidebar-nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="sidebar-nav-item" data-page="patients">
+            <span class="sidebar-nav-icon">👥</span>
+            <span>Patients</span>
+          </a>
+          <a href="#" class="sidebar-nav-item" data-page="medicines">
+            <span class="sidebar-nav-icon">💊</span>
+            <span>Medicines</span>
+          </a>
+          <a href="#" class="sidebar-nav-item" data-page="reports">
+            <span class="sidebar-nav-icon">📈</span>
+            <span>Reports</span>
+          </a>
+          <a href="#" class="sidebar-nav-item" data-page="payments">
+            <span class="sidebar-nav-icon">💳</span>
+            <span>Upgrade</span>
+          </a>
+          <a href="#" class="sidebar-nav-item" data-page="settings">
+            <span class="sidebar-nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+          <a href="#" class="sidebar-nav-item" id="logoutBtn">
+            <span class="sidebar-nav-icon">🚪</span>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="page-content">
+          <div class="page-header">
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle">Welcome back! Here's your overview</p>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <div class="stats-card">
+              <div class="stats-icon">👥</div>
+              <div class="stats-content">
+                <h4 class="stats-value" id="totalPatients">0</h4>
+                <p class="stats-label">Total Patients</p>
+              </div>
+            </div>
+
+            <div class="stats-card">
+              <div class="stats-icon">💊</div>
+              <div class="stats-content">
+                <h4 class="stats-value" id="activeMedicines">0</h4>
+                <p class="stats-label">Active Medicines</p>
+              </div>
+            </div>
+
+            <div class="stats-card">
+              <div class="stats-icon">⏰</div>
+              <div class="stats-content">
+                <h4 class="stats-value" id="todayReminders">0</h4>
+                <p class="stats-label">Today's Reminders</p>
+              </div>
+            </div>
+
+            <div class="stats-card">
+              <div class="stats-icon">📊</div>
+              <div class="stats-content">
+                <h4 class="stats-value" id="adherenceRate">0%</h4>
+                <p class="stats-label">Adherence Rate</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="section">
+            <div class="section-header">
+              <h2 class="section-title">Quick Actions</h2>
+            </div>
+            <div class="quick-actions">
+              <button class="quick-action-btn" id="addPatientBtn">
+                <div class="quick-action-icon">👤</div>
+                <div class="quick-action-content">
+                  <h4>Add Patient</h4>
+                  <p>Register a new patient</p>
+                </div>
+              </button>
+              <button class="quick-action-btn" id="addMedicineBtn">
+                <div class="quick-action-icon">💊</div>
+                <div class="quick-action-content">
+                  <h4>Add Medicine</h4>
+                  <p>Schedule new medication</p>
+                </div>
+              </button>
+              <button class="quick-action-btn" id="viewReportsBtn">
+                <div class="quick-action-icon">📈</div>
+                <div class="quick-action-content">
+                  <h4>View Reports</h4>
+                  <p>Analyze adherence data</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Low Stock Alerts -->
+          <div class="section" id="lowStockSection" style="display: none;">
+            <div class="section-header">
+              <h2 class="section-title">⚠️ Low Stock Alerts</h2>
+            </div>
+            <div id="lowStockAlerts"></div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="section">
+            <div class="section-header">
+              <h2 class="section-title">Recent Activity</h2>
+            </div>
+            <div class="activity-feed" id="activityFeed">
+              <p style="text-align: center; color: var(--text-tertiary); padding: 2rem;">
+                No recent activity
+              </p>
+            </div>
+          </div>
+
+          <!-- Upcoming Reminders -->
+          <div class="section">
+            <div class="section-header">
+              <h2 class="section-title">Upcoming Reminders</h2>
+            </div>
+            <div id="upcomingReminders">
+              <p style="text-align: center; color: var(--text-tertiary); padding: 2rem;">
+                No upcoming reminders
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Patients Page -->
+        <div id="patientsPage" class="page-content" style="display: none;">
+          <div class="page-header">
+            <h1 class="page-title">Patients</h1>
+            <button class="btn btn-primary" id="addPatientBtn2">+ Add Patient</button>
+          </div>
+
+          <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search patients..." id="patientSearch">
+          </div>
+
+          <div class="patient-list" id="patientList">
+            <div class="empty-state">
+              <div class="empty-state-icon">👥</div>
+              <h3 class="empty-state-title">No Patients Yet</h3>
+              <p class="empty-state-description">Add your first patient to get started</p>
+              <button class="btn btn-primary" id="addPatientBtn3">+ Add Patient</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medicines Page -->
+        <div id="medicinesPage" class="page-content" style="display: none;">
+          <div class="page-header">
+            <h1 class="page-title">Medicines</h1>
+            <button class="btn btn-primary" id="addMedicineBtn2">+ Add Medicine</button>
+          </div>
+
+          <div class="filter-bar">
+            <div class="filter-group">
+              <label class="filter-label">Patient:</label>
+              <select class="filter-select" id="patientFilter">
+                <option value="">All Patients</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Status:</label>
+              <select class="filter-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+              </select>
+            </div>
+            <div class="view-toggle">
+              <button class="view-toggle-btn active" data-view="grid">Grid</button>
+              <button class="view-toggle-btn" data-view="list">List</button>
+            </div>
+          </div>
+
+          <div class="medicines-grid" id="medicinesList">
+            <div class="empty-state">
+              <div class="empty-state-icon">💊</div>
+              <h3 class="empty-state-title">No Medicines Yet</h3>
+              <p class="empty-state-description">Add medicines for your patients</p>
+              <button class="btn btn-primary" id="addMedicineBtn3">+ Add Medicine</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other pages placeholder -->
+        <div id="reportsPage" class="page-content" style="display: none;">
+          <div class="page-header">
+            <h1 class="page-title">Reports</h1>
+          </div>
+          <p>Reports coming soon...</p>
+        </div>
+
+        <div id="paymentsPage" class="page-content" style="display: none;">
+          <div class="page-header">
+            <h1 class="page-title">Upgrade to Premium</h1>
+          </div>
+          <p>Payment options coming soon...</p>
+        </div>
+
+        <div id="settingsPage" class="page-content" style="display: none;">
+          <div class="page-header">
+            <h1 class="page-title">Settings</h1>
+          </div>
+          <p>Settings coming soon...</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ✅ Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/caregiver.js"></script>
+  <script src="js/app.js"></script>
+  
+  <script>
+    // Check authentication
+    if (!AuthUtils.requireAuth()) {
+      window.location.href = 'auth-login.html';
+    }
+
+    // Load user info
+    const currentUser = AuthUtils.getCurrentUser();
+    if (currentUser) {
+      document.getElementById('userName').textContent = currentUser.name;
+      document.getElementById('userAvatar').textContent = currentUser.name.substring(0, 2).toUpperCase();
+    }
+
+    // Navigation
+    document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        const page = this.dataset.page;
+        
+        if (page) {
+          // Update active state
+          document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Show page
+          document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+          document.getElementById(page + 'Page').style.display = 'block';
+        }
+      });
+    });
+
+    // Mobile menu toggle
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+      document.getElementById('sidebar').classList.toggle('active');
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      if (confirm('Are you sure you want to logout?')) {
+        AuthUtils.logout();
+      }
+    });
+
+    // Initialize caregiver dashboard
+    if (typeof initializeCaregiverDashboard === 'function') {
+      initializeCaregiverDashboard();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4b45f5">
+  <title>Patient Dashboard - TabTimer</title>
+  
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layouts.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  
+  <style>
+    .patient-header {
+      background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+      color: white;
+      padding: var(--space-8) var(--space-6);
+      margin: calc(var(--space-6) * -1) calc(var(--space-6) * -1) var(--space-8);
+    }
+    
+    .patient-greeting {
+      font-size: var(--font-size-3xl);
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+    
+    .patient-date {
+      font-size: var(--font-size-lg);
+      opacity: 0.9;
+    }
+    
+    .summary-card {
+      background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+      color: white;
+      border-radius: var(--radius-2xl);
+      padding: var(--space-8);
+      margin-bottom: var(--space-8);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 100%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Top Navigation -->
+    <nav class="navbar">
+      <div class="navbar-container">
+        <a href="app-patient.html" class="navbar-logo">
+          <div class="navbar-logo-icon">💊</div>
+          <span>TabTimer</span>
+        </a>
+        
+        <div class="navbar-actions">
+          <button class="navbar-notification" id="notificationBtn">
+            🔔
+            <span class="navbar-notification-badge" id="notificationBadge" style="display: none;">0</span>
+          </button>
+          
+          <div class="navbar-profile" id="profileMenu">
+            <div class="navbar-profile-avatar" id="userAvatar">PT</div>
+            <span class="navbar-profile-name" id="userName">Patient</span>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Patient Header -->
+      <div class="patient-header">
+        <h1 class="patient-greeting" id="greeting">Good Morning!</h1>
+        <p class="patient-date" id="currentDate">Today is Monday, February 17, 2026</p>
+      </div>
+
+      <!-- Today's Summary -->
+      <div class="summary-card" style="position: relative; z-index: 1;">
+        <div style="position: relative; z-index: 2;">
+          <h2 style="font-size: var(--font-size-2xl); margin-bottom: var(--space-2);">Today's Medicines</h2>
+          <div style="font-size: var(--font-size-4xl); font-weight: 700; margin-bottom: var(--space-4);">
+            <span id="takenCount">0</span> of <span id="totalCount">0</span> taken
+          </div>
+          <div style="height: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 999px; overflow: hidden; margin-bottom: var(--space-3);">
+            <div id="progressBar" style="height: 100%; width: 0%; background: white; border-radius: 999px; transition: width 0.5s;"></div>
+          </div>
+          <p style="opacity: 0.9;" id="summaryText">Keep it up! 🎯</p>
+        </div>
+      </div>
+
+      <!-- Medicine Timeline -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Your Schedule</h2>
+        </div>
+        
+        <div class="timeline" id="medicineTimeline">
+          <p style="text-align: center; color: var(--text-tertiary); padding: 2rem;">
+            Loading your medicines...
+          </p>
+        </div>
+      </div>
+
+      <!-- All Medicines Grid -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">All Medicines</h2>
+        </div>
+        
+        <div class="medicines-grid" id="medicinesGrid">
+          <div class="empty-state">
+            <div class="empty-state-icon">💊</div>
+            <h3 class="empty-state-title">No Medicines Yet</h3>
+            <p class="empty-state-description">Your caregiver will add medicines for you</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+      <a href="#" class="mobile-bottom-nav-item active" data-view="today">
+        <span class="mobile-bottom-nav-icon">📅</span>
+        <span>Today</span>
+      </a>
+      <a href="#" class="mobile-bottom-nav-item" data-view="all">
+        <span class="mobile-bottom-nav-icon">💊</span>
+        <span>All</span>
+      </a>
+      <a href="#" class="mobile-bottom-nav-item" data-view="history">
+        <span class="mobile-bottom-nav-icon">📊</span>
+        <span>History</span>
+      </a>
+      <a href="#" class="mobile-bottom-nav-item" data-view="profile">
+        <span class="mobile-bottom-nav-icon">👤</span>
+        <span>Profile</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Medicine Alert Modal -->
+  <div class="modal modal-fullscreen" id="medicineAlertModal">
+    <div class="modal-content">
+      <div class="modal-header" style="text-align: center; padding: var(--space-8);">
+        <h2 style="font-size: var(--font-size-3xl);">⏰ TIME TO TAKE YOUR MEDICINE!</h2>
+      </div>
+      <div class="modal-body" style="text-align: center; padding: var(--space-8);">
+        <h1 style="font-size: var(--font-size-4xl); margin-bottom: var(--space-4);" id="alertMedicineName">Aspirin 500mg</h1>
+        <p style="font-size: var(--font-size-xl); color: var(--text-secondary); margin-bottom: var(--space-6);" id="alertInstructions">
+          Take 2 tablets with water after breakfast
+        </p>
+        
+        <div class="voice-player" id="voicePlayerContainer" style="display: none;">
+          <button class="voice-player-btn" id="playVoiceBtn">▶️</button>
+          <div class="voice-waveform" id="voiceWaveform"></div>
+          <span class="voice-duration" id="voiceDuration">0:00</span>
+        </div>
+        
+        <p style="font-size: var(--font-size-lg); color: var(--text-secondary); margin-top: var(--space-6);">
+          📦 Stock remaining: <span id="alertStock">24</span> tablets
+        </p>
+      </div>
+      <div class="modal-footer" style="flex-direction: column; gap: var(--space-3);">
+        <button class="btn btn-success btn-lg" id="markTakenBtn" style="width: 100%;">
+          ✅ I Took My Medicine
+        </button>
+        <button class="btn btn-secondary" id="snoozeBtn" style="width: 100%;">
+          ⏰ Snooze 10 Minutes
+        </button>
+        <button class="btn btn-text" id="skipBtn">
+          ❌ Skip This Dose
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/medicine.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/patient.js"></script>
+  <script src="js/app.js"></script>
+  
+  <script>
+    // Check authentication
+    if (!AuthUtils.requireAuth()) {
+      window.location.href = 'auth-login.html';
+    }
+
+    // Load user info
+    const currentUser = AuthUtils.getCurrentUser();
+    if (currentUser) {
+      document.getElementById('userName').textContent = currentUser.name;
+      document.getElementById('userAvatar').textContent = currentUser.name.substring(0, 2).toUpperCase();
+    }
+
+    // Set greeting based on time
+    const hour = new Date().getHours();
+    let greeting = 'Good Morning';
+    if (hour >= 12 && hour < 17) greeting = 'Good Afternoon';
+    else if (hour >= 17) greeting = 'Good Evening';
+    document.getElementById('greeting').textContent = greeting + ', ' + (currentUser?.name?.split(' ')[0] || 'Patient') + '!';
+
+    // Set current date
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('currentDate').textContent = 'Today is ' + new Date().toLocaleDateString('en-US', options);
+
+    // Profile menu
+    document.getElementById('profileMenu')?.addEventListener('click', function() {
+      const menu = document.createElement('div');
+      menu.className = 'dropdown-menu';
+      menu.style.cssText = 'position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: white; border-radius: 0.5rem; box-shadow: 0 10px 15px rgba(0,0,0,0.1); padding: 0.5rem; min-width: 150px; z-index: 1000;';
+      menu.innerHTML = `
+        <a href="#" style="display: block; padding: 0.5rem 1rem; color: var(--text-primary); text-decoration: none; border-radius: 0.25rem;" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">Settings</a>
+        <a href="#" id="logoutLink" style="display: block; padding: 0.5rem 1rem; color: var(--danger); text-decoration: none; border-radius: 0.25rem;" onmouseover="this.style.background='var(--danger-light)'" onmouseout="this.style.background='transparent'">Logout</a>
+      `;
+      
+      document.body.appendChild(menu);
+      
+      document.getElementById('logoutLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (confirm('Are you sure you want to logout?')) {
+          AuthUtils.logout();
+        }
+      });
+      
+      setTimeout(() => {
+        document.addEventListener('click', function remove() {
+          menu.remove();
+          document.removeEventListener('click', remove);
+        });
+      }, 100);
+    });
+
+    // Initialize patient dashboard
+    if (typeof initializePatientDashboard === 'function') {
+      initializePatientDashboard();
+    }
+
+    // Request notification permission
+    NotificationUtils.requestPermission();
+  </script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TabTimer - Supabase Connection Test</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f0f4ff; }
+    h1 { color: #4b45f5; }
+    .card { background: white; border-radius: 12px; padding: 20px; margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .status { padding: 10px 16px; border-radius: 8px; font-weight: bold; margin: 8px 0; }
+    .ok   { background: #d1fae5; color: #065f46; }
+    .fail { background: #fee2e2; color: #991b1b; }
+    .info { background: #dbeafe; color: #1e40af; }
+    button { background: #4b45f5; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; margin: 8px 4px; }
+    button:hover { background: #3730a3; }
+    pre { background: #f8f8f8; padding: 12px; border-radius: 8px; font-size: 13px; overflow-x: auto; }
+    input { width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; margin: 6px 0; font-size: 14px; box-sizing: border-box; }
+    label { font-size: 13px; color: #6b7280; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<h1>💊 TabTimer - Supabase Connection Test</h1>
+
+<!-- Test 1: Library Load -->
+<div class="card">
+  <h3>1️⃣ Supabase Library</h3>
+  <div id="lib-status" class="status info">Checking...</div>
+</div>
+
+<!-- Test 2: Client Init -->
+<div class="card">
+  <h3>2️⃣ Client Initialization</h3>
+  <div id="client-status" class="status info">Waiting...</div>
+  <pre id="config-info"></pre>
+</div>
+
+<!-- Test 3: DB Connection -->
+<div class="card">
+  <h3>3️⃣ Database Connection</h3>
+  <div id="db-status" class="status info">Waiting...</div>
+  <button onclick="testDatabase()">Test Database</button>
+  <pre id="db-result"></pre>
+</div>
+
+<!-- Test 4: Auth Test -->
+<div class="card">
+  <h3>4️⃣ Auth Test - Sign Up / Sign In</h3>
+  <label>Email</label>
+  <input id="test-email" type="email" value="test@tabtimer.com" />
+  <label>Password</label>
+  <input id="test-pass" type="password" value="TestPass123!" />
+  <br>
+  <button onclick="testSignUp()">Test Sign Up</button>
+  <button onclick="testSignIn()">Test Sign In</button>
+  <div id="auth-status" class="status info" style="display:none"></div>
+  <pre id="auth-result"></pre>
+</div>
+
+<!-- ✅ Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+
+<script>
+let client = null;
+
+// Test 1: Check library loaded
+window.addEventListener('DOMContentLoaded', () => {
+  const libDiv = document.getElementById('lib-status');
+  const supabaseLib = window.supabase;
+
+  if (supabaseLib && typeof supabaseLib.createClient === 'function') {
+    libDiv.className = 'status ok';
+    libDiv.textContent = '✅ Supabase library loaded successfully!';
+    initClient();
+  } else {
+    libDiv.className = 'status fail';
+    libDiv.textContent = '❌ Supabase library NOT loaded. Check your internet connection or CDN link.';
+  }
+});
+
+// Test 2: Initialize client
+function initClient() {
+  const statusDiv = document.getElementById('client-status');
+  const infoDiv = document.getElementById('config-info');
+
+  try {
+    client = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+    statusDiv.className = 'status ok';
+    statusDiv.textContent = '✅ Supabase client initialized!';
+    infoDiv.textContent = `URL: ${CONFIG.supabase.url}\nAnon Key: ${CONFIG.supabase.anonKey.substring(0, 30)}...`;
+  } catch (err) {
+    statusDiv.className = 'status fail';
+    statusDiv.textContent = '❌ Failed to init client: ' + err.message;
+  }
+}
+
+// Test 3: Database query
+async function testDatabase() {
+  const statusDiv = document.getElementById('db-status');
+  const resultDiv = document.getElementById('db-result');
+
+  if (!client) {
+    statusDiv.className = 'status fail';
+    statusDiv.textContent = '❌ Client not initialized';
+    return;
+  }
+
+  statusDiv.className = 'status info';
+  statusDiv.textContent = '⏳ Testing database...';
+
+  try {
+    // Try to query the users table
+    const { data, error } = await client.from('users').select('count').limit(1);
+
+    if (error) {
+      statusDiv.className = 'status fail';
+      statusDiv.textContent = '❌ DB Error: ' + error.message;
+      resultDiv.textContent = JSON.stringify(error, null, 2);
+    } else {
+      statusDiv.className = 'status ok';
+      statusDiv.textContent = '✅ Database connected! users table is accessible.';
+      resultDiv.textContent = JSON.stringify(data, null, 2);
+    }
+  } catch (err) {
+    statusDiv.className = 'status fail';
+    statusDiv.textContent = '❌ Connection failed: ' + err.message;
+    resultDiv.textContent = err.stack;
+  }
+}
+
+// Test 4: Auth
+async function testSignUp() {
+  const email = document.getElementById('test-email').value;
+  const pass = document.getElementById('test-pass').value;
+  const statusDiv = document.getElementById('auth-status');
+  const resultDiv = document.getElementById('auth-result');
+  statusDiv.style.display = 'block';
+  statusDiv.className = 'status info';
+  statusDiv.textContent = '⏳ Signing up...';
+
+  const { data, error } = await client.auth.signUp({ email, password: pass });
+
+  if (error) {
+    statusDiv.className = 'status fail';
+    statusDiv.textContent = '❌ Sign Up Error: ' + error.message;
+  } else {
+    statusDiv.className = 'status ok';
+    statusDiv.textContent = '✅ Sign Up successful! Check email for verification.';
+  }
+  resultDiv.textContent = JSON.stringify(error || data, null, 2);
+}
+
+async function testSignIn() {
+  const email = document.getElementById('test-email').value;
+  const pass = document.getElementById('test-pass').value;
+  const statusDiv = document.getElementById('auth-status');
+  const resultDiv = document.getElementById('auth-result');
+  statusDiv.style.display = 'block';
+  statusDiv.className = 'status info';
+  statusDiv.textContent = '⏳ Signing in...';
+
+  const { data, error } = await client.auth.signInWithPassword({ email, password: pass });
+
+  if (error) {
+    statusDiv.className = 'status fail';
+    statusDiv.textContent = '❌ Sign In Error: ' + error.message;
+  } else {
+    statusDiv.className = 'status ok';
+    statusDiv.textContent = '✅ Sign In successful! User: ' + data.user.email;
+  }
+  resultDiv.textContent = JSON.stringify(error || { user: data?.user?.email, session: !!data?.session }, null, 2);
+}
+</script>
+</body>
+</html>
