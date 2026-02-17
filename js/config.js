@@ -6,7 +6,7 @@ const CONFIG = {
   supabase: {
     url: 'https://tgpxefccobzlfyazqxwq.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRncHhlZmNjb2J6bGZ5YXpxeHdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyOTYxMTYsImV4cCI6MjA4Njg3MjExNn0.qaaxXMOHWAnEljal3Uh6FseKdo9ZDEHQ10JdrGAIw9c',
-    serviceKey: 'YOUR_SUPABASE_SERVICE_KEY' // ⚠️ Only use server-side (PHP), never expose in frontend
+    serviceKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRncHhlZmNjb2J6bGZ5YXpxeHdxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTI5NjExNiwiZXhwIjoyMDg2ODcyMTE2fQ.1jrXTSiVwqRjFvrm-WIxHWse7J14CYaMt4RKOy2tgnE' // ⚠️ Only use server-side (PHP), never expose in frontend
   },
 
   // Google Drive API Configuration
