@@ -191,36 +191,63 @@ async function submitAddPatient(e) {
   submitBtn.textContent = 'Adding...';
 
   try {
-    // Create auth account for patient using a secondary client so caregiver stays logged in
+    // Step 1: Sign up patient on a temp client (keeps caregiver logged in)
     const tempClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
     const { data: authData, error: signUpError } = await tempClient.auth.signUp({ email, password });
     if (signUpError) throw signUpError;
     if (!authData.user) throw new Error('Failed to create patient account');
 
-    // Insert patient profile linked to this caregiver
-    const { error: profileError } = await supabaseClient
-      .from('users')
-      .insert([{
-        id: authData.user.id,
-        email,
-        name,
-        role: 'patient',
-        phone: phone || null,
-        caregiver_id: currentCaregiver.id
-      }]);
-    if (profileError) throw profileError;
+    const patientId = authData.user.id;
 
-    // Default settings row
-    await supabaseClient.from('settings').insert([{ user_id: authData.user.id }]);
+    // Step 2: Insert patient profile
+    // If patient has a live session (email confirm OFF), use their token — satisfies auth.uid() = id
+    // If session is null (email confirm ON), use caregiver session — requires the updated RLS policy
+    const insertClient = authData.session
+      ? window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey, {
+          global: { headers: { Authorization: `Bearer ${authData.session.access_token}` } }
+        })
+      : supabaseClient; // caregiver's session — needs RLS policy: caregiver_id = auth.uid()
 
-    toast.success(`✅ Patient "${name}" added! They can now log in with their email & password.`);
+    const { error: profileError } = await insertClient.from('users').insert([{
+      id: patientId,
+      email,
+      name,
+      role: 'patient',
+      phone: phone || null,
+      caregiver_id: currentCaregiver.id
+    }]);
+
+    if (profileError) {
+      if (profileError.message.includes('row-level security')) {
+        throw new Error('RLS_ERROR');
+      }
+      throw profileError;
+    }
+
+    // Step 3: Default settings
+    try { await insertClient.from('settings').insert([{ user_id: patientId }]); } catch(_) {}
+
+    toast.success(`✅ Patient "${name}" added! They can log in with their email & password.`);
     closeAddPatientModal();
     await loadPatients();
     await loadDashboardStats();
 
   } catch (err) {
+    console.error('Add patient error:', err);
     let msg = err.message || 'Failed to add patient';
     if (msg.includes('already registered')) msg = 'This email is already registered. Use a different email.';
+    if (msg === 'RLS_ERROR') {
+      msg = `Permission denied. Please run this SQL in your Supabase dashboard → SQL Editor:
+
+CREATE POLICY "caregivers_insert_patients" ON users
+FOR INSERT WITH CHECK (
+  caregiver_id = auth.uid()
+  OR auth.uid() = id
+);
+
+Then try again.`;
+    }
+    errDiv.style.whiteSpace = 'pre-wrap';
     errDiv.textContent = '❌ ' + msg;
     errDiv.style.display = 'block';
   } finally {
@@ -421,4 +448,4 @@ function setupEventListeners() {
     document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
     document.getElementById('reportsPage').style.display = 'block';
   });
-  }
+      }
