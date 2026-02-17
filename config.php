@@ -13,7 +13,7 @@ header('Access-Control-Allow-Headers: Content-Type, Authorization');
 // Environment variables (create .env file or hardcode for now)
 define('SUPABASE_URL', getenv('SUPABASE_URL') ?: 'https://tgpxefccobzlfyazqxwq.supabase.co');
 define('SUPABASE_KEY', getenv('SUPABASE_KEY') ?: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRncHhlZmNjb2J6bGZ5YXpxeHdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyOTYxMTYsImV4cCI6MjA4Njg3MjExNn0.qaaxXMOHWAnEljal3Uh6FseKdo9ZDEHQ10JdrGAIw9c');
-define('SUPABASE_SERVICE_KEY', getenv('SUPABASE_SERVICE_KEY') ?: 'YOUR_SUPABASE_SERVICE_KEY'); // ⚠️ Get from Supabase dashboard → Settings → API → service_role key
+define('SUPABASE_SERVICE_KEY', getenv('SUPABASE_SERVICE_KEY') ?: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRncHhlZmNjb2J6bGZ5YXpxeHdxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTI5NjExNiwiZXhwIjoyMDg2ODcyMTE2fQ.1jrXTSiVwqRjFvrm-WIxHWse7J14CYaMt4RKOy2tgnE'); // ⚠️ Get from Supabase dashboard → Settings → API → service_role key
 
 // Session configuration
 ini_set('session.cookie_httponly', 1);
