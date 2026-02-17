@@ -136,44 +136,90 @@
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<span class="spinner"></span> Signing in...';
 
+      // Show inline error message
+      function showError(msg) {
+        let errDiv = document.getElementById('login-error');
+        if (!errDiv) {
+          errDiv = document.createElement('div');
+          errDiv.id = 'login-error';
+          errDiv.style.cssText = 'background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:8px;margin-top:12px;font-size:14px;text-align:center;';
+          submitBtn.parentNode.insertBefore(errDiv, submitBtn.nextSibling);
+        }
+        errDiv.textContent = msg;
+        errDiv.style.display = 'block';
+      }
+
+      function hideError() {
+        const errDiv = document.getElementById('login-error');
+        if (errDiv) errDiv.style.display = 'none';
+      }
+
       try {
-        // TODO: Implement actual login logic with Supabase
-        console.log('Login data:', { email, password, remember });
-        
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Handle remember me
+        hideError();
+
+        // ✅ Step 1: Create real Supabase client
+        const supabaseClient = window.supabase.createClient(
+          CONFIG.supabase.url,
+          CONFIG.supabase.anonKey
+        );
+
+        // ✅ Step 2: Sign in with real email & password
+        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (authError) throw authError;
+
+        // ✅ Step 3: Get real user profile from your 'users' table
+        const { data: profileData, error: profileError } = await supabaseClient
+          .from('users')
+          .select('*')
+          .eq('id', authData.user.id)
+          .single();
+
+        // If profile row is missing, create a basic one automatically
+        if (profileError) {
+          const basicProfile = {
+            id: authData.user.id,
+            email: authData.user.email,
+            name: authData.user.email.split('@')[0],
+            role: 'caregiver'
+          };
+          await supabaseClient.from('users').insert([basicProfile]);
+          localStorage.setItem('currentUser', JSON.stringify(basicProfile));
+        } else {
+          // ✅ Step 4: Save to localStorage (NOT sessionStorage)
+          localStorage.setItem('currentUser', JSON.stringify(profileData));
+        }
+
+        // ✅ Step 5: Save real auth token
+        localStorage.setItem('authToken', authData.session.access_token);
+
+        // ✅ Handle remember me
         if (remember) {
           localStorage.setItem('rememberedEmail', email);
         } else {
           localStorage.removeItem('rememberedEmail');
         }
-        
-        // Mock user data - replace with actual Supabase response
-        const mockUser = {
-          id: 'user-123',
-          email: email,
-          name: 'John Doe',
-          role: 'caregiver' // or 'patient'
-        };
-        
-        // Store user data
-        sessionStorage.setItem('currentUser', JSON.stringify(mockUser));
-        localStorage.setItem('authToken', 'mock-token-' + Date.now());
-        
-        // Redirect based on role
-        window.location.href = mockUser.role === 'caregiver' 
-          ? 'app-caregiver.html' 
-          : 'app-patient.html';
+
+        // ✅ Step 6: Redirect based on REAL role from database
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        const role = user ? user.role : 'caregiver';
+        window.location.href = role === 'patient' ? 'app-patient.html' : 'app-caregiver.html';
+
       } catch (error) {
         console.error('Login failed:', error);
         document.getElementById('password').classList.add('error');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
-        
-        // Show error message
-        alert('Login failed. Please check your credentials and try again.');
+
+        // Show friendly error messages
+        let msg = error.message || 'Login failed. Please try again.';
+        if (msg.includes('Invalid login credentials')) msg = '❌ Wrong email or password. Please try again.';
+        if (msg.includes('Email not confirmed')) msg = '📧 Please check your email and confirm your account first.';
+        if (msg.includes('Too many requests')) msg = '⏳ Too many attempts. Please wait a moment and try again.';
+        showError(msg);
       }
     });
 
